@@ -3,6 +3,7 @@
 clear
 echo ------------------------------------------
 echo        CentOS7 openssh升级到8.4p1--online
+echo        配合最新openssl-1.1.1j--2021-02-16
 echo            By feichai
 echo            Mod cnrock
 echo         生产环境使用前请做好测试
@@ -10,9 +11,9 @@ echo ------------------------------------------
 sleep 3s
 clear
 echo 下载关键包
-wget http://cdn.download.fcblog.cn/openssl-1.0.2r.tar.gz
-wget http://cdn.download.fcblog.cn/openssh-8.4p1.tar.gz
-wget http://cdn.download.fcblog.cn/zlib-1.2.11.tar.gz
+wget https://www.openssl.org/source/openssl-1.1.1j.tar.gz
+wget https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-8.4p1.tar.gz
+wget http://www.zlib.net/zlib-1.2.11.tar.gz
 echo 安装进程开始
 sleep 1s
 clear
@@ -107,8 +108,8 @@ clear
 echo 安装openssl
 echo $(date +%F-%T)  安装openssl开始…… >> update.log
 sleep 2s
-tar -zxvf openssl-1.0.2r.tar.gz
-cd openssl-1.0.2r
+tar -zxvf openssl-1.1.1j.tar.gz
+cd openssl-1.1.1j
 ./config shared zlib && make && make install
 cd ..
 echo $(date +%F-%T)  安装openssl结束…… >> update.log
