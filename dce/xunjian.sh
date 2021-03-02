@@ -103,8 +103,8 @@ echo  -e "$b----以下为控制DCE控制阶段信息---" $e
 # 在控制器执行即可
 kubectl get cs
 kubectl get nodes | grep -v Ready
-kubectl get pods -o wide --all-namespaces | grep -v Running
-shibai=$(kubectl get pods -o wide --all-namespaces | grep -v Running|wc -l)
+kubectl get pods -o wide --all-namespaces | grep -v Running|grep -v Completed
+shibai=$(kubectl get pods -o wide --all-namespaces | grep -v Running|grep -v Completed|wc -l)
 echo -e "$c----失败的pod数量为：$shibai" $e
 
 echo  -e "$c------巡检结束---请核对信息-------" $e
