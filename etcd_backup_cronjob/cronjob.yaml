@@ -1,0 +1,63 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: etcd-backup-dce-10-23-3-84
+spec:
+  concurrencyPolicy: Allow
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+        spec:
+          volumes:
+           - hostPath:
+              path: /var/local/dce/etcd
+              type: Directory
+             name: etcd-data
+           - name: certs
+             hostPath:
+               path: /etc/daocloud/dce/certs/
+               type: Directory
+           - name: nfs-volume
+             nfs:
+               readOnly: false
+               # should be edited
+               path: /nfs_ssd/long.domain.test
+               server: 10.23.2.249
+          nodeSelector:
+            kubernetes.io/hostname: dce-10-23-3-84
+          containers:
+          - name: etcd-backup
+            image: 10.23.101.18/kube-system/etcd-backup:3.4.1.1
+            imagePullPolicy: Always
+            env:
+            - name: debug
+              value: "false"
+            - name: etcd_data_dir
+              value: /etcd_data/etcd
+            - name: etcd_backup_save_dir
+              value: /nfs
+            volumeMounts:
+              - mountPath: /etcd_data
+                name: etcd-data
+                readOnly: true
+              - mountPath: /etc/ssl/private/
+                name: certs
+                readOnly: true
+              - name: nfs-volume
+                mountPath: /nfs
+                readOnly: false
+            command:
+            - "/docker-entrypoint.sh"
+          tolerations:
+            - effect: NoSchedule
+              operator: Exists
+            - effect: NoExecute
+              operator: Exists
+          dnsPolicy: ClusterFirst
+          hostNetwork: true
+          restartPolicy: Never
+  schedule: '28 17 * * *'
+  suspend: false
