@@ -1,0 +1,57 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: job-etcd-master1-backup
+spec:
+  template:
+    metadata:
+      name: job-etcd-master1-backup
+    spec:
+      volumes:
+       - hostPath:
+           path: /var/local/dce/etcd
+           type: Directory
+         name: etcd-data
+       - name: certs
+         hostPath:
+           path: /etc/daocloud/dce/certs/
+           type: Directory
+       - name: nfs-volume
+         nfs:
+           readOnly: false
+           # should be edited
+           path: /etcd-backup
+           server: 192.168.101.131
+      restartPolicy: Never
+      nodeSelector:
+        # shoule be edited
+        kubernetes.io/hostname: dce-10-23-3-84
+      hostNetwork: true
+      containers:
+      - name: etcd-backup
+        env:
+         - name: debug
+           value: "false"
+         - name: etcd_data_dir
+           value: /etcd_data/etcd
+         - name: etcd_backup_save_dir
+           value: /nfs
+        image: 10.23.101.18/kube-system/etcd-backup:3.4.1.1
+        imagePullPolicy: Always
+        volumeMounts:
+          - mountPath: /etcd_data
+            name: etcd-data
+            readOnly: true
+          - mountPath: /etc/ssl/private/
+            name: certs
+            readOnly: true
+          - name: nfs-volume
+            mountPath: /nfs
+            readOnly: false
+        command:
+        - "/docker-entrypoint.sh"
+      tolerations:
+        - effect: NoSchedule
+          operator: Exists
+        - effect: NoExecute
+          operator: Exists
