@@ -5,8 +5,9 @@ ENV TIMEZONE="Asia/Shanghai"     \
     BUILD_DEPS="tzdata.          \
                 curl             \
                 sudo             \
-			        	ca-certificates  \
-			        	ssmtp            \
+		ca-certificates  \
+		ssmtp            \
+		nano            \
                 bash"
 
 RUN apk update                                              && \
