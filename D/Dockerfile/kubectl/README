@@ -1,0 +1,55 @@
+
+代码来源
+https://github.com/rancher/kubectl
+他的基础镜像是 FROM registry.suse.com/bci/bci-base:15.4.27.14.18 AS build
+zypper -n install curl 同时执行时，arm64 这一步有报错，单独执行没问题
+
+更换基础镜像
+container-registry.oracle.com/os/oraclelinux:9-slim
+
+目前只能分别架构 直接push 到仓库，没有合并 tag
+ => => pushing layers                                                                                                                                                                            4.4s
+ => => pushing manifest for docker.io/cnrock/kubectl:v1.25.4-amd64
+ 。。。。。。。
+ => => pushing layers                                                                                                                                                                            0.7s
+ => => pushing manifest for docker.io/cnrock/kubectl:v1.25.4-arm64  0.2s
+ 
+ 合并时报错。。。
+"docker manifest create" requires at least 2 arguments.
+See 'docker manifest create --help'.
+
+Usage:  docker manifest create MANIFEST_LIST MANIFEST [MANIFEST...]
+
+Create a local manifest list for annotating and pushing to a registry
+
+上面问题没解决前，只能手动合并 mainfest，分别执行这2步
+
+docker manifest create cnrock/kubectl:v1.25.4 --amend cnrock/kubectl:v1.25.4-amd64 --amend cnrock/kubectl:v1.25.4-arm64
+docker manifest push docker.io/cnrock/kubectl:v1.25.4
+
+检查合并后效果
+docker manifest inspect docker.io/cnrock/kubectl:v1.25.4
+{
+   "schemaVersion": 2,
+   "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
+   "manifests": [
+      {
+         "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+         "size": 943,
+         "digest": "sha256:f458694b806bf0f0053788b0bea5c8f7e5369f06608560ba57e86ff7260de6bc",
+         "platform": {
+            "architecture": "amd64",
+            "os": "linux"
+         }
+      },
+      {
+         "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+         "size": 943,
+         "digest": "sha256:c579d6e1fc64590cd62d8e2a8ee647b85e089f785398e0448b9d9ceabc665899",
+         "platform": {
+            "architecture": "arm64",
+            "os": "linux"
+         }
+      }
+   ]
+}
