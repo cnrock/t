@@ -1,0 +1,12 @@
+	auth required pam_sepermit.so</p>
+									<p>auth include password-auth</p>
+									<p>account required pam_nologin.so</p>
+									<p>account include password-auth</p>
+									<p>password include password-auth</p>
+									<p>## pam_selinux.so close should be the first session rule</p>
+									<p>session required pam_selinux.so close</p>
+									<p>session required pam_loginuid.so</p>
+									<p>## pam_selinux.so open should only be followed by sessions to be executed in the user context</p>
+									<p>session required pam_selinux.so open env_params</p>
+									<p>session optional pam_keyinit.so force revoke</p>
+									<p>session include password-auth</p>
