@@ -1,0 +1,28 @@
+##FROM  alpine:latest
+FROM --platform=$TARGETPLATFORM alpine:3.17.3
+LABEL MAINTAINER Wan Jie <webmaster@wanjie.info>
+
+ENV TIMEZONE="Asia/Shanghai" \
+    BUILD_DEPS="tzdata \
+                curl \
+                sudo \
+                nano \
+                bash \
+                bind-tools \
+                nginx=1.22.1-r0"
+RUN apk update && \
+    apk add --no-cache ${BUILD_DEPS}                        && \
+    cp -rfv  /usr/share/zoneinfo/${TIMEZONE} /etc/localtime && \
+    echo ${TIMEZONE} > /etc/timezone                        && \
+    apk del tzdata                                          && \
+    rm -rf /var/cache/apk/*
+RUN echo 'export ORACLE_HOME=/instanclient11' >> ~/.bashrc
+RUN echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$ORACLE_HOME' >> ~/.bashrc
+RUN source ~/.bashrc
+COPY 2048 /usr/share/nginx/html
+COPY 2048/default.conf /etc/nginx/http.d/default.conf
+COPY Dockerfile /usr/share/nginx/html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
