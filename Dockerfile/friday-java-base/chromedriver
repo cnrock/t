@@ -1,0 +1,31 @@
+FROM amazoncorretto:8u362-al2023-jre
+
+COPY ./google-chrome.repo /etc/yum.repos.d/google-chrome.repo
+
+# Set up Chromedriver Environment variables
+ENV CHROMEDRIVER_DIR /opt/chromedriver
+ENV PATH $CHROMEDRIVER_DIR:$PATH
+
+# Set up JAVA evn
+ENV JAVA_TOOL_OPTIONS="-Duser.timezone=Asia/Shanghai" \
+    TZ="Asia/Shanghai"
+    
+RUN    yum makecache -y  && \
+    yum install wget google-chrome-stable -y && \
+#    wget -c https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm && \
+#    yum localinstall google-chrome-stable_current_x86_64.rpm && \
+    yum install libnsl tar unzip jq -y 
+#   rm -f google-chrome-stable_current_x86_64.rpm
+
+RUN curl -s https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json > /tmp/versions.json
+
+RUN CHROMEDRIVER_URL=$(jq -r '.channels.Stable.downloads.chromedriver[] | select(.platform=="linux64") | .url' /tmp/versions.json) && \
+    wget -q --continue -O /tmp/chromedriver-linux64.zip $CHROMEDRIVER_URL && \
+    unzip /tmp/chromedriver-linux64.zip -d /opt/chromedriver && \
+    chmod +x /opt/chromedriver/chromedriver-linux64/chromedriver && \
+    mv  /opt/chromedriver/chromedriver-linux64/chromedriver /usr/local/bin/
+
+
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+COPY ./lrzsz.rpm ./
+RUN  rpm -ivh lrzsz.rpm &&  rm -rf /var/cache/yum/*  && yum clean all
