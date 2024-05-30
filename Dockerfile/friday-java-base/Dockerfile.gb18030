@@ -1,0 +1,18 @@
+FROM amazoncorretto:8u362-al2023-jre
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+RUN yum install libnsl tar unzip fontconfig glibc-locale-source glibc-langpack-en -y
+RUN curl -L https://cdn.amazonlinux.com/2/core/2.0/x86_64/6b0225ccc542f3834c95733dcf321ab9f1e77e6ca6817469771a8af7c49efe6c/../../../../../blobstore/c196f67c9052022cd29b9924a8f40602c34fd1b8247a1d149b477e1eb5c8b391/wqy-zenhei-fonts-0.9.46-11.amzn2.noarch.rpm -o wqy.rpm
+COPY ./lrzsz.rpm ./
+RUN  rpm -ivh lrzsz.rpm wqy.rpm &&  rm -rf /var/cache/yum/*  && yum clean all
+
+RUN  sed -i 's/en_US.UTF-8/zh_CN.GB18030/g' /etc/sysconfig/i18n &&  fc-cache -fv &&  source /etc/sysconfig/i18n 
+
+ENV JAVA_TOOL_OPTIONS="-Duser.timezone=Asia/Shanghai" \
+    TZ="Asia/Shanghai" \ 
+	LANG="zh_CN.GB18030" \
+	LC_ALL="zh_CN.GB18030"
+
+
+ADD https://github.com/Yelp/dumb-init/releases/download/v1.2.5/dumb-init_1.2.5_x86_64 /usr/local/bin/dumb-init
+RUN chmod +x /usr/local/bin/dumb-init
+ENTRYPOINT ["/usr/local/bin/dumb-init", "--"]
