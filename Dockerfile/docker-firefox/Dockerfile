@@ -7,7 +7,7 @@
 #
 
 # Build the membarrier check tool.
-FROM --platform=$TARGETPLATFORM alpine:3.14 AS membarrier
+FROM --platform=$TARGETPLATFORM alpine:3.20 AS membarrier
 WORKDIR /tmp
 COPY membarrier_check.c .
 RUN apk --no-cache add build-base linux-headers
@@ -15,7 +15,7 @@ RUN gcc -static -o membarrier_check membarrier_check.c
 RUN strip membarrier_check
 
 # Pull base image.
-FROM --platform=$TARGETPLATFORM jlesage/baseimage-gui:alpine-3.18-v4.4.2
+FROM --platform=$TARGETPLATFORM jlesage/baseimage-gui:alpine-3.20-v4.6.4
 
 # Docker image version is provided via build arg.
 ARG DOCKER_IMAGE_VERSION=
@@ -23,7 +23,8 @@ ARG DOCKER_IMAGE_VERSION=
 ENV TIMEZONE="Asia/Shanghai"
 
 # Define software versions.
-ARG FIREFOX_VERSION=119.0-r0
+ARG FIREFOX_VERSION=131.0.2-r0
+#ARG FIREFOX_VERSION=119.0-r0
 #ARG FIREFOX_VERSION=114.0.2-r0
 #ARG PROFILE_CLEANER_VERSION=2.36
 
