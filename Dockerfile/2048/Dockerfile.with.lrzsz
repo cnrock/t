@@ -1,8 +1,17 @@
-FROM --platform=$TARGETPLATFORM  alpine:latest as base
+FROM --platform=$TARGETPLATFORM  alpine:3.20 as base
 LABEL MAINTAINER Wan Jie <webmaster@wanjie.info>
-RUN apk add  gcc    g++  make curl
+RUN apk add --no-cache \
+    gcc \
+    g++ \
+    make \
+    curl \
+    musl-dev \
+    autoconf \
+    automake \
+    libtool \
+    pkgconfig
 
-RUN curl -L https://ohse.de/uwe/testing/lrzsz-0.12.21rc.tar.gz -o lrzsz-0.12.21rc.tar.gz \
+RUN curl -L  https://github.com/cnrock/t/raw/refs/heads/master/Dockerfile/2048/lrzsz-0.12.21rc.tar.gz -o lrzsz-0.12.21rc.tar.gz \
     && tar -xf lrzsz-0.12.21rc.tar.gz \
     && cd lrzsz-0.12.21rc/ \
     && ./configure \
@@ -25,8 +34,13 @@ ENV TIMEZONE="Asia/Shanghai" \
                 iperf3 \
                 nginx \
                 iputils \
+                curl \
+                kubectl \
                 stress-ng \
                 openssl \
+                openssh \
+                rsync \
+                bash-completion \
                 bind-tools"
 
 					
@@ -42,6 +56,12 @@ RUN apk update && \
 COPY 2048 /usr/share/nginx/html
 COPY 2048/default.conf /etc/nginx/http.d/default.conf
 COPY Dockerfile /usr/share/nginx/html
+
+RUN echo 'source <(/usr/bin/kubectl completion bash)' >> .bashrc && \
+    echo 'alias k=kubectl' >> .bashrc && \
+    echo 'complete -o default -F __start_kubectl k' >> .bashrc && \
+    echo "export POD_NAMESPACE='default'" >> .bashrc && \
+    echo "export POD_NAMESPACE='default'" > .env
 
 EXPOSE 80
 
