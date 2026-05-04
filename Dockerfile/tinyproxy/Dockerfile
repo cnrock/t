@@ -8,8 +8,13 @@
 # Usage:        docker build -t cnrock/tinyproxy:latest .
 ###############################################################################
 
-FROM --platform=$TARGETPLATFORM alpine:latest
-LABEL MAINTAINER Wan Jie <webmaster@wanjie.info>
+#FROM --platform=$TARGETPLATFORM alpine:latest
+#LABEL MAINTAINER Wan Jie <webmaster@wanjie.info>
+FROM alpine:edge
+
+LABEL maintainer="Wan Jie <webmaster@wanjie.info>" \
+      version="1.11.3" \
+      description="Alpine Linux BaseImage，tinyproxy"
 
 COPY run.sh /opt/docker-tinyproxy/run.sh
 
