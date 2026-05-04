@@ -1,5 +1,8 @@
-FROM alpine:3.12
-LABEL MAINTAINER="webmaster@wanjie.info"
+FROM  alpine:latest
+
+LABEL maintainer="Wan Jie <webmaster@wanjie.info>" \
+      version="1.0.0" \
+      description="Alpine Linux BaseImage，include curl,bash,openssh,bind-tools with ShangHai timezone"
 
 ENV TIMEZONE="Asia/Shanghai"              \
     BUILD_DEPS="tzdata \
@@ -8,6 +11,8 @@ ENV TIMEZONE="Asia/Shanghai"              \
                 bash \
                 dnscache \
                 openssh-client \
+                bind-tools \
+                pciutils \
                 sshpass \
                 acl"
 
