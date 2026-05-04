@@ -1,6 +1,4 @@
-FROM --platform=$TARGETPLATFORM  alpine:latest
-#FROM  alpine:latest
-#FROM --platform=$TARGETPLATFORM nginx:1.24.0-alpine-slim
+FROM --platform=$TARGETPLATFORM nginx:1.29.0-alpine-slim
 LABEL MAINTAINER Wan Jie <webmaster@wanjie.info>
 
 ENV TIMEZONE="Asia/Shanghai" \
@@ -8,8 +6,12 @@ ENV TIMEZONE="Asia/Shanghai" \
                 sudo \
                 nano \
                 bash \
+                curl \
+                wget \
+                kubectl \
                 iperf3 \
                 nginx \
+                iputils \
                 stress-ng \
                 openssl \
                 bind-tools"
@@ -19,8 +21,10 @@ RUN apk update && \
     cp -rfv  /usr/share/zoneinfo/${TIMEZONE} /etc/localtime && \
     echo ${TIMEZONE} > /etc/timezone                        && \
     apk del tzdata                                          && \
-    apk add --no-cache curl ca-certificates && \ 
-    touch /etc/ca-certificates.conf && \ 
+    wget -c https://mirror.math.princeton.edu/pub/alpinelinux/edge/testing/x86_64/lrzsz-0.12.20-r2.apk             && \
+     apk add lrzsz-0.12.20-r2.apk         && \
+    apk add --no-cache curl ca-certificates && \
+    touch /etc/ca-certificates.conf && \
     rm -rf /var/cache/apk/*
 COPY 2048 /usr/share/nginx/html
 COPY 2048/default.conf /etc/nginx/http.d/default.conf
